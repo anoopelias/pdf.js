@@ -1,0 +1,75 @@
+
+PDFNetworkStream
+  NetworkManager
+
+
+Worker
+  WorkerMessageHandler
+    setup - to handle test message
+    createDocumentHandler - create a handler for a document. Lives through the lifetime of a document
+      handler = new MessageHandler()
+      getPdfManager
+        LocalPdfManager
+          PDFWorkerStream
+          PDFNetworkStream
+        NetworkPdfManager
+
+      'GetPage'
+      'GetPageIndex'
+      'GetDestinations'
+      'GetDestination'
+      'GetPageLabels'
+      'GetAttachments'
+      'GetJavaScript'
+      'GetOutline'
+      'GetMetadata'
+      'GetData'
+      'GetStats'
+      'UpdatePassword'
+      'GetAnnotations'
+      'RenderPageRequest'
+      'GetTextContent'
+      'Cleanup'
+      'Terminate'
+      'Ready'
+      
+  initializeWorker
+    handler = new MessageHandler()
+    WorkerMessageHandler.setup()
+      on 'Test'
+        handler.send('Test')
+      on 'GetDocRequest'
+        WorkerMessageHandler.createDocumentHandler()
+
+
+
+
+
+
+-------------------------------------------------
+PDFDocumentProxy
+
+WorkerTransport
+  'GetDoc'
+
+PDFWorker
+  messageHandler - to send and rx message from worker
+  _initialize - Initializes the worker, send test message, recieve it, 
+    and initialize fake worker if required
+
+getDocument
+  task = new PDFDocumentLoadingTask
+  task._worker = new PDFWorker
+
+  return task
+
+src
+  display
+    api.js
+      getDocument
+web
+  viewer.js
+  app.js
+   -> calls getDocument in api.js
+
+
