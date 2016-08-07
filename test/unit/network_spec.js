@@ -1,5 +1,5 @@
-/* globals expect, it, describe, PDFNetworkStream, fit, 
-          InvalidHeaderException, beforeAll */
+/* globals expect, it, describe, PDFNetworkStream, beforeAll,
+          InvalidHeaderException */
 
 'use strict';
 
