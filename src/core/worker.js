@@ -565,7 +565,7 @@ var WorkerMessageHandler = {
       }
 
       var fullRequest = pdfStream.getFullReader();
-      fullRequest.headersReady.then(function () {
+      fullRequest.headersReady.then(function (headers) {
         if (!fullRequest.isStreamingSupported ||
             !fullRequest.isRangeSupported) {
           // If stream or range are disabled, it's our only way to report

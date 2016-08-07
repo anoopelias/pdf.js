@@ -656,6 +656,16 @@ var NetworkManager = (function NetworkManagerClosure() {
 
       var networkManager = this._manager;
       var fullRequestXhrId = this._fullRequestId;
+      var headers = Object.create(null);
+
+      var fullRequestXhr = networkManager.getRequestXhr(fullRequestXhrId);
+      var contentDispositionString =
+        fullRequestXhr.getResponseHeader('Content-Disposition');
+      if (contentDispositionString && contentDispositionString.length > 0) {
+        headers.contentDisposition =
+          this._parseContentDisposition(contentDispositionString);
+      }
+
       if (networkManager.isStreamingRequest(fullRequestXhrId)) {
         // We can continue fetching when progressive loading is enabled,
         // and we don't need the autoFetch feature.
@@ -669,7 +679,7 @@ var NetworkManager = (function NetworkManagerClosure() {
         networkManager.abortRequest(fullRequestXhrId);
       }
 
-      this._headersReceivedCapability.resolve();
+      this._headersReceivedCapability.resolve(headers);
     },
 
     _onProgressiveData:
