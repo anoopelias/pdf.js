@@ -345,7 +345,7 @@ describe('network', function() {
               'attachment; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u20ac rates.pdf' }
+            parameters: { 'filename': '€ rates.pdf' }
           });
       });
 
@@ -354,7 +354,7 @@ describe('network', function() {
               'attachment; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u20ac rates.pdf' }
+            parameters: { 'filename': '€ rates.pdf' }
           });
         expect(parseContentDisposition(
               'attachment; filename*=UTF-8\'\'%E4%20rates.pdf'))
@@ -369,7 +369,7 @@ describe('network', function() {
               'attachment; filename*=ISO-8859-1\'\'%A3%20rates.pdf'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u00a3 rates.pdf' }
+            parameters: { 'filename': '£ rates.pdf' }
           });
         expect(parseContentDisposition(
               'attachment; filename*=ISO-8859-1\'\'%82%20rates.pdf'))
@@ -384,7 +384,7 @@ describe('network', function() {
               'attachment; filename*=utf-8\'\'%E2%82%AC%20rates.pdf'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u20ac rates.pdf' }
+            parameters: { 'filename': '€ rates.pdf' }
           });
       });
 
@@ -399,7 +399,7 @@ describe('network', function() {
               'attachment; filename*=UTF-8\'en\'%E2%82%AC%20rates.pdf'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u20ac rates.pdf' }
+            parameters: { 'filename': '€ rates.pdf' }
           });
       });
 
@@ -409,14 +409,14 @@ describe('network', function() {
               'filename*=UTF-8\'\'%E2%82%AC%20rates.pdf'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u20ac rates.pdf' }
+            parameters: { 'filename': '€ rates.pdf' }
           });
         expect(parseContentDisposition(
               'attachment; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf; ' +
               'filename="EURO rates.pdf"'))
           .toEqual({
             type: 'attachment',
-            parameters: { 'filename': '\u20ac rates.pdf' }
+            parameters: { 'filename': '€ rates.pdf' }
           });
       });
     });
@@ -614,10 +614,10 @@ describe('network', function() {
 
         it('should parse "attachment; filename="foo-Ã¤.html""', function () {
           expect(parseContentDisposition(
-                'attachment; filename="foo-\u00c3\u00a4.html"'))
+                'attachment; filename="foo-Ã¤.html"'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00c3\u00a4.html' }
+              parameters: { filename: 'foo-Ã¤.html' }
             });
         });
 
@@ -877,7 +877,7 @@ describe('network', function() {
                 'attachment; filename*=iso-8859-1\'\'foo-%E4.html'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00e4.html' }
+              parameters: { filename: 'foo-ä.html' }
             });
         });
 
@@ -887,7 +887,7 @@ describe('network', function() {
               'attachment; filename*=UTF-8\'\'foo-%c3%a4-%e2%82%ac.html'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00e4-\u20ac.html' }
+              parameters: { filename: 'foo-ä-€.html' }
             });
         });
 
@@ -904,7 +904,7 @@ describe('network', function() {
                 'attachment; filename*=UTF-8\'\'foo-a%cc%88.html'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-a\u0308.html' }
+              parameters: { filename: 'foo-ä.html' }
             });
         });
 
@@ -914,7 +914,7 @@ describe('network', function() {
               'attachment; filename*=iso-8859-1\'\'foo-%c3%a4-%e2%82%ac.html'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00c3\u00a4-\u00e2?\u00ac.html' }
+              parameters: { filename: 'foo-Ã¤-â?¬.html' }
             });
         });
 
@@ -941,7 +941,7 @@ describe('network', function() {
                 'attachment; filename*= UTF-8\'\'foo-%c3%a4.html'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00e4.html' }
+              parameters: { filename: 'foo-ä.html' }
             });
         });
 
@@ -951,7 +951,7 @@ describe('network', function() {
                 'attachment; filename* =UTF-8\'\'foo-%c3%a4.html'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00e4.html' }
+              parameters: { filename: 'foo-ä.html' }
             });
         });
 
@@ -1099,7 +1099,7 @@ describe('network', function() {
               'filename*=UTF-8\'\'foo-%c3%a4.html'))
           .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00e4.html' }
+              parameters: { filename: 'foo-ä.html' }
             });
         });
 
@@ -1110,7 +1110,7 @@ describe('network', function() {
                 'filename="foo-ae.html"'))
             .toEqual({
               type: 'attachment',
-              parameters: { filename: 'foo-\u00e4.html' }
+              parameters: { filename: 'foo-ä.html' }
             });
         });
 
@@ -1123,7 +1123,7 @@ describe('network', function() {
             .toEqual({
               type: 'attachment',
               parameters: {
-                filename: 'currency-sign=\u00a4',
+                filename: 'currency-sign=¤',
                 'filename*0*': 'ISO-8859-15\'\'euro-sign%3d%a4'
               }
             });
