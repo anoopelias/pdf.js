@@ -10,6 +10,9 @@ The following changes are made from the original content-disposition npm module,
         console.log(message);
 
         This runs fine in node, while the character turns jibberish in chrome
+    - Found that the default encoding in Chrome and Firefox is not 'utf8'
+    - Another option is to open the browser in 'utf8' encoding when we open the browser
+
 4. The Buffer class in Node.js is not available in browser. So decode 'utf-8' character, we use 
   return decodeURIComponent(escape(str));
-However this cannot handle invalid unicode encoding pairs. So those test cases are commented now
+However this cannot handle invalid unicode encoding pairs. So those test cases are commented now.
