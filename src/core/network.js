@@ -308,6 +308,7 @@ var NetworkManager = (function NetworkManagerClosure() {
   var assert = sharedUtil.assert;
   var createPromiseCapability = sharedUtil.createPromiseCapability;
   var isInt = sharedUtil.isInt;
+  var stringToUTF8String = sharedUtil.stringToUTF8String;
   var MissingPDFException = sharedUtil.MissingPDFException;
   var UnexpectedResponseException = sharedUtil.UnexpectedResponseException;
   var InvalidHeaderException = sharedUtil.InvalidHeaderException;
@@ -523,7 +524,7 @@ var NetworkManager = (function NetworkManagerClosure() {
         value = getlatin1(binary);
         break;
       case 'utf-8':
-        value = new Buffer(binary, 'binary').toString('utf8');
+        value = stringToUTF8String(binary);
         break;
       default:
         throw new 
@@ -572,8 +573,8 @@ var NetworkManager = (function NetworkManagerClosure() {
       return true;
     },
 
-    _parseContentDisposition: 
-      function NetworkManager_parseContentDisposition(string) {
+    _parseContentDisposition: function
+      PDFNetworkStreamFullRequestReader_parseContentDisposition(string) {
         if (!string || typeof string !== 'string') {
           throw new InvalidHeaderException('argument string is required');
         }

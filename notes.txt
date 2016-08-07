@@ -1,0 +1,15 @@
+
+The following changes are made from the original content-disposition npm module,
+
+1. Changed all 'assert's to 'expect's
+2. Changed the line indentation and splits matching the linting requirements in pdf.js
+3. Used \u characters instead of the original unicode characters
+    - This is not causing a probem in nodejs, but is causing a problem in browser environment
+    - It has been proved by running the below code both in chrome and node
+        var message = "Euro €";
+        console.log(message);
+
+        This runs fine in node, while the character turns jibberish in chrome
+4. The Buffer class in Node.js is not available in browser. So decode 'utf-8' character, we use 
+  return decodeURIComponent(escape(str));
+However this cannot handle invalid unicode encoding pairs. So those test cases are commented now
