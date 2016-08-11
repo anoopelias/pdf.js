@@ -49,6 +49,16 @@ var BasePdfManager = (function BasePdfManagerClosure() {
       return this._docId;
     },
 
+    get filename() {
+      return this._filename;
+    },
+
+    set httpHeaders(headers) {
+      if (headers && headers.contentDisposition) {
+        this._filename = headers.contentDisposition.parameters.filename;
+      }
+    },
+
     onLoadedStream: function BasePdfManager_onLoadedStream() {
       throw new NotImplementedException();
     },

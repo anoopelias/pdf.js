@@ -474,6 +474,7 @@ var WorkerMessageHandler = {
     // This context is actually holds references on pdfManager and handler,
     // until the latter is destroyed.
     var pdfManager;
+    var httpHeaders;
     var terminated = false;
     var cancelXHRs = null;
     var WorkerTasks = [];
@@ -515,6 +516,7 @@ var WorkerMessageHandler = {
             numPages: results[0],
             fingerprint: results[1],
             encrypted: !!results[2],
+            filename: pdfManager.filename
           };
           loadDocumentCapability.resolve(doc);
         },
@@ -578,6 +580,8 @@ var WorkerMessageHandler = {
           };
         }
 
+        httpHeaders = headers;
+
         if (!fullRequest.isRangeSupported) {
           return;
         }
@@ -593,6 +597,7 @@ var WorkerMessageHandler = {
           disableAutoFetch: disableAutoFetch,
           rangeChunkSize: source.rangeChunkSize
         }, evaluatorOptions);
+        pdfManager.httpHeaders = httpHeaders;
         pdfManagerCapability.resolve(pdfManager);
         cancelXHRs = null;
       }).catch(function (reason) {
@@ -610,6 +615,7 @@ var WorkerMessageHandler = {
         try {
           pdfManager = new LocalPdfManager(docId, pdfFile, source.password,
                                            evaluatorOptions);
+          pdfManager.httpHeaders = httpHeaders;
           pdfManagerCapability.resolve(pdfManager);
         } catch (ex) {
           pdfManagerCapability.reject(ex);
