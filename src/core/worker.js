@@ -474,7 +474,7 @@ var WorkerMessageHandler = {
     // This context is actually holds references on pdfManager and handler,
     // until the latter is destroyed.
     var pdfManager;
-    var httpHeaders;
+    var filename;
     var terminated = false;
     var cancelXHRs = null;
     var WorkerTasks = [];
@@ -580,7 +580,9 @@ var WorkerMessageHandler = {
           };
         }
 
-        httpHeaders = headers;
+        if (headers && headers.contentDisposition) {
+          filename = headers.contentDisposition.parameters.filename;
+        }
 
         if (!fullRequest.isRangeSupported) {
           return;
@@ -595,9 +597,9 @@ var WorkerMessageHandler = {
           password: source.password,
           length: fullRequest.contentLength,
           disableAutoFetch: disableAutoFetch,
-          rangeChunkSize: source.rangeChunkSize
+          rangeChunkSize: source.rangeChunkSize,
+          filename: filename         
         }, evaluatorOptions);
-        pdfManager.httpHeaders = httpHeaders;
         pdfManagerCapability.resolve(pdfManager);
         cancelXHRs = null;
       }).catch(function (reason) {
@@ -614,8 +616,7 @@ var WorkerMessageHandler = {
         // the data is array, instantiating directly from it
         try {
           pdfManager = new LocalPdfManager(docId, pdfFile, source.password,
-                                           evaluatorOptions);
-          pdfManager.httpHeaders = httpHeaders;
+                                           evaluatorOptions, filename);
           pdfManagerCapability.resolve(pdfManager);
         } catch (ex) {
           pdfManagerCapability.reject(ex);
