@@ -22,3 +22,5 @@ TODO :
 1. Test InvalidHeaderException
 2. RegExp linting Errors
 3. Use Object.create in _parseContentDisposition
+4. Connect filename in the UI
+5. Compare with chrome behaviour on 'attachment' and 'inline'

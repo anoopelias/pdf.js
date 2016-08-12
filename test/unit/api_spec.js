@@ -329,6 +329,7 @@ describe('api', function() {
       expect(doc.filename).toEqual('basicapi.pdf');
     });
     it('gets filename for a document with range fetch', function(done) {
+      // A larger file means the worker will use the range request
       var url2 = new URL('../pdfs/aboutstacks.pdf', window.location).href;
       var loadingTask2 = PDFJS.getDocument(url2);
       loadingTask2.promise.then(function (pdfDoc) {
