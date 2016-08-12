@@ -647,6 +647,31 @@ var NetworkManager = (function NetworkManagerClosure() {
         };
     },
 
+    _parseHeaders: function PDFNetworkStreamFullRequestReader_parseHeaders() {
+      try {
+        var headers = Object.create(null);
+        var networkManager = this._manager;
+        var fullRequestXhrId = this._fullRequestId;
+        var fullRequestXhr = networkManager.getRequestXhr(fullRequestXhrId);
+        var contentDispositionString =
+          fullRequestXhr.getResponseHeader('Content-Disposition');
+
+        if (contentDispositionString && contentDispositionString.length > 0) {
+          headers.contentDisposition =
+            this._parseContentDisposition(contentDispositionString);
+        }
+
+        return headers;
+      } catch(err) {
+        if (err instanceof InvalidHeaderException) {
+          // Ignore invalid headers
+          return headers;
+        } else {
+          throw err;
+        }
+      }
+    },
+
     _onHeadersReceived:
         function PDFNetworkStreamFullRequestReader_onHeadersReceived() {
 
@@ -656,15 +681,7 @@ var NetworkManager = (function NetworkManagerClosure() {
 
       var networkManager = this._manager;
       var fullRequestXhrId = this._fullRequestId;
-      var headers = Object.create(null);
-
-      var fullRequestXhr = networkManager.getRequestXhr(fullRequestXhrId);
-      var contentDispositionString =
-        fullRequestXhr.getResponseHeader('Content-Disposition');
-      if (contentDispositionString && contentDispositionString.length > 0) {
-        headers.contentDisposition =
-          this._parseContentDisposition(contentDispositionString);
-      }
+      var headers = this._parseHeaders();
 
       if (networkManager.isStreamingRequest(fullRequestXhrId)) {
         // We can continue fetching when progressive loading is enabled,
