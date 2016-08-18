@@ -351,7 +351,10 @@ var NetworkManager = (function NetworkManagerClosure() {
    *                 DEL (127)>
    * OCTET         = <any 8-bit sequence of data>
    */
-  var PARAM_REGEXP = /; *([!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+) *= *("(?:[ !\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"|[!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+) */g
+  var PARAM_REGEXP = new RegExp(
+      /; *([!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+) *= */.source + '(' +
+      /"(?:[ !\x23-\x5b\x5d-\x7e\x80-\xff]|\\[\x20-\x7e])*"/.source + '|' +
+      /([!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+)/.source + ')', 'g');
 
   /**
    * RegExp for various RFC 5987 grammar
@@ -373,7 +376,12 @@ var NetworkManager = (function NetworkManagerClosure() {
    *               / "!" / "#" / "$" / "&" / "+" / "-" / "."
    *               / "^" / "_" / "`" / "|" / "~"
    */
-  var EXT_VALUE_REGEXP = /^([A-Za-z0-9!#$%&+\-^_`{}~]+)'(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)'((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+\-\.^_`|~])+)$/
+
+  var EXT_VALUE_REGEXP = new RegExp(
+      /^([A-Za-z0-9!#$%&+\-^_`{}~]+)/.source + '\'' +
+      /(?:[A-Za-z]{2,3}(?:-[A-Za-z]{3}){0,3}|[A-Za-z]{4,8}|)/.source + '\'' +
+      /((?:%[0-9A-Fa-f]{2}|[A-Za-z0-9!#$&+\-\.^_`|~])+)/.source + '$');
+
   var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
 
   /**
@@ -388,7 +396,6 @@ var NetworkManager = (function NetworkManagerClosure() {
    * CHAR        = <any US-ASCII character (octets 0 - 127)>
    */
   var QESC_REGEXP = /\\([\u0000-\u007f])/g;
-
 
   /** @implements {IPDFStream} */
   function PDFNetworkStream(options) {

@@ -11,6 +11,6 @@ However this cannot handle invalid unicode encoding pairs. So those test cases a
 TODO :
 
 1. Test InvalidHeaderException
-2. RegExp linting Errors
+2. Fix two xit test cases
 3. Use Object.create in _parseContentDisposition
 4. Connect filename in the UI
