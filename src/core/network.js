@@ -488,7 +488,7 @@ var NetworkManager = (function NetworkManagerClosure() {
    * @api private
    */
 
-  function pdecode (str, hex) {
+  function pdecode(str, hex) {
     return String.fromCharCode(parseInt(hex, 16));
   }
 
@@ -500,9 +500,21 @@ var NetworkManager = (function NetworkManagerClosure() {
    * @api private
    */
 
-  function getlatin1 (val) {
+  function getlatin1(val) {
     // simple Unicode -> ISO-8859-1 transformation
     return String(val).replace(NON_LATIN1_REGEXP, '?');
+  }
+
+  function getUtf8(binary) {
+    try {
+      return stringToUTF8String(binary);
+    } catch (error) {
+      if (error instanceof URIError) {
+        throw new InvalidHeaderException('invalid extended field value');
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -512,7 +524,7 @@ var NetworkManager = (function NetworkManagerClosure() {
    * @return {string}
    * @api private
    */
-  function decodefield (str) {
+  function decodefield(str) {
     var match = EXT_VALUE_REGEXP.exec(str);
 
     if (!match) {
@@ -531,7 +543,7 @@ var NetworkManager = (function NetworkManagerClosure() {
         value = getlatin1(binary);
         break;
       case 'utf-8':
-        value = stringToUTF8String(binary);
+        value = getUtf8(binary);
         break;
       default:
         throw new 

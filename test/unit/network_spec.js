@@ -349,19 +349,10 @@ describe('network', function() {
           });
       });
 
-      xit('should parse UTF-8 extended parameter value', function () {
-        expect(parseContentDisposition(
-              'attachment; filename*=UTF-8\'\'%E2%82%AC%20rates.pdf'))
-          .toEqual({
-            type: 'attachment',
-            parameters: { 'filename': '€ rates.pdf' }
-          });
-        expect(parseContentDisposition(
+      it('should parse UTF-8 extended parameter value', function () {
+        expect(parseContentDisposition.bind(null,
               'attachment; filename*=UTF-8\'\'%E4%20rates.pdf'))
-          .toEqual({
-            type: 'attachment',
-            parameters: { 'filename': '\ufffd rates.pdf' }
-          });
+          .toThrowError(InvalidHeaderException, /invalid extended.*value/);
       });
 
       it('should parse ISO-8859-1 extended parameter value', function () {
@@ -918,14 +909,11 @@ describe('network', function() {
             });
         });
 
-        xit('should parse "attachment; filename*=utf-8\'\'foo-%E4.html"',
+        it('should parse "attachment; filename*=utf-8\'\'foo-%E4.html"',
             function () {
-          expect(parseContentDisposition(
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename*=utf-8\'\'foo-%E4.html'))
-            .toEqual({
-              type: 'attachment',
-              parameters: { filename: 'foo-\ufffd.html' }
-            });
+            .toThrowError(InvalidHeaderException, /invalid extended.*value/);
         });
 
         it('should reject "attachment; filename *=UTF-8\'\'foo-%c3%a4.html"',
