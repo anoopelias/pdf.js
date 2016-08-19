@@ -598,6 +598,7 @@ var NetworkManager = (function NetworkManagerClosure() {
           throw new InvalidHeaderException('argument string is required');
         }
 
+        var contentDisposition = {};
         var match = DISPOSITION_TYPE_REGEXP.exec(string);
         if (!match) {
           throw new InvalidHeaderException('invalid type format');
@@ -605,7 +606,7 @@ var NetworkManager = (function NetworkManagerClosure() {
 
         // normalize type
         var index = match[0].length;
-        var type = match[1].toLowerCase();
+        contentDisposition.type = match[1].toLowerCase();
 
         var key;
         var names = [];
@@ -660,10 +661,8 @@ var NetworkManager = (function NetworkManagerClosure() {
           throw new InvalidHeaderException('invalid parameter format');
         }
 
-        return {
-          type: type,
-          parameters: params
-        };
+        contentDisposition.parameters = params;
+        return contentDisposition;
     },
 
     _parseHeaders: function PDFNetworkStreamFullRequestReader_parseHeaders() {
