@@ -676,7 +676,7 @@ var PDFViewerApplication = {
     }
 
     // There could be a filename available from network call
-    filename = this.pdfDocument.filename || filename;
+    filename = this.pdfDocumentProperties.getFileName();
 
     this.pdfDocument.getData().then(
       function getDataSuccess(data) {
