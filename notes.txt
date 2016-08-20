@@ -11,7 +11,10 @@ TODO :
 
 3. Connect filename in the UI
   - Document Properties (Done)
-  - Download
+  - Download (Done)
   - setTitle
   - Annotations (?)
   - Attachments (?)
+
+1. Remove comments for private functions in network.js
+  
