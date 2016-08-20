@@ -10,3 +10,8 @@
 TODO :
 
 3. Connect filename in the UI
+  - Document Properties (Done)
+  - Download
+  - setTitle
+  - Annotations (?)
+  - Attachments (?)
