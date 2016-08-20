@@ -820,6 +820,8 @@ var PDFViewerApplication = {
 
     this.pdfDocumentProperties.setDocumentAndUrl(pdfDocument, this.url);
 
+    this.setTitle(this.pdfDocumentProperties.getFileName());
+
     var downloadedPromise = pdfDocument.getDownloadInfo().then(function() {
       self.downloadComplete = true;
       self.loadingBar.hide();

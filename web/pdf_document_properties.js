@@ -116,6 +116,20 @@ var PDFDocumentProperties = (function PDFDocumentPropertiesClosure() {
     },
 
     /**
+     * Get file name as displayed in the document properties overlay.
+     *
+     */
+    getFileName: function PDFDocumentProperties_getFileName() {
+      var filename = this.pdfDocument.filename;
+
+      if (!filename) {
+        filename = getPDFFileNameFromURL(this.url);
+      }
+
+      return filename;
+    },
+
+    /**
      * @private
      */
     _getProperties: function PDFDocumentProperties_getProperties() {
@@ -136,7 +150,7 @@ var PDFDocumentProperties = (function PDFDocumentPropertiesClosure() {
       // Get the document properties.
       this.pdfDocument.getMetadata().then(function(data) {
         var content = {
-          'fileName': this._getFileName(),
+          'fileName': this.getFileName(),
           'fileSize': this._parseFileSize(),
           'title': data.info.Title,
           'author': data.info.Author,
@@ -164,19 +178,6 @@ var PDFDocumentProperties = (function PDFDocumentPropertiesClosure() {
       if (field && content !== undefined && content !== '') {
         field.textContent = content;
       }
-    },
-
-    /**
-     * @private
-     */
-    _getFileName: function PDFDocumentProperties_getFileName() {
-      var filename = this.pdfDocument.filename;
-
-      if (!filename) {
-        filename = getPDFFileNameFromURL(this.url);
-      }
-
-      return filename;
     },
 
     /**
