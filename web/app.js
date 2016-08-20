@@ -675,6 +675,9 @@ var PDFViewerApplication = {
       return;
     }
 
+    // There could be a filename available from network call
+    filename = this.pdfDocument.filename || filename;
+
     this.pdfDocument.getData().then(
       function getDataSuccess(data) {
         var blob = pdfjsLib.createBlob(data, 'application/pdf');
