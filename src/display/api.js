@@ -466,9 +466,9 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
       return this.pdfInfo.numPages;
     },
     /**
-     * @return {string} File name of the pdf if available. If the source 
+     * @return {string} File name of the pdf if available. If the source
      *   is a URL, file name will be extracted from content-disposition
-     *   header. 
+     *   header.
      */
     get filename() {
       return this.pdfInfo.filename;

@@ -176,7 +176,7 @@ describe('network', function() {
       });
 
       var fullReader = stream.getFullReader();
-      parseContentDisposition = 
+      parseContentDisposition =
         fullReader._parseContentDisposition;
     });
 
@@ -239,13 +239,13 @@ describe('network', function() {
 
     describe('with parameters', function () {
       it('should reject trailing semicolon', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename="rates.pdf";'))
           .toThrowError(InvalidHeaderException, /invalid parameter format/);
       });
 
       it('should reject invalid parameter name', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename@="rates.pdf"'))
           .toThrowError(InvalidHeaderException, /invalid parameter format/);
       });
@@ -256,19 +256,19 @@ describe('network', function() {
       });
 
       it('should reject invalid parameter value', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename=trolly,trains'))
           .toThrowError(InvalidHeaderException, /invalid parameter format/);
       });
 
       it('should reject invalid parameters', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename=total/; foo=bar'))
           .toThrowError(InvalidHeaderException, /invalid parameter format/);
       });
 
       it('should reject duplicate parameters', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename=foo; filename=bar'))
           .toThrowError(InvalidHeaderException, /invalid duplicate parameter/);
       });
@@ -335,7 +335,7 @@ describe('network', function() {
 
     describe('with extended parameters', function () {
       it('should reject quoted extended parameter value', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename*="UTF-8\'\'%E2%82%AC%20rates.pdf"'))
           .toThrowError(InvalidHeaderException, /invalid extended.*value/);
       });
@@ -380,7 +380,7 @@ describe('network', function() {
       });
 
       it('should reject unsupported charset', function () {
-        expect(parseContentDisposition.bind(null, 
+        expect(parseContentDisposition.bind(null,
               'attachment; filename*=ISO-8859-2\'\'%A4%20rates.pdf'))
           .toThrowError(InvalidHeaderException, /unsupported charset/);
       });
@@ -564,25 +564,25 @@ describe('network', function() {
         });
 
         it('should reject "attachment; filename=foo,bar.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo,bar.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=foo.html ;"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo.html ;'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; ;filename=foo"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; ;filename=foo'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=foo bar.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo bar.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
@@ -673,26 +673,26 @@ describe('network', function() {
 
         it('should reject "attachment; ' +
             'filename="foo.html"; filename="bar.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename="foo.html"; filename="bar.html"'))
-            .toThrowError(InvalidHeaderException, 
+            .toThrowError(InvalidHeaderException,
                 /invalid duplicate parameter/);
         });
 
         it('should reject "attachment; filename=foo[1](2).html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo[1](2).html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=foo-ä.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo-ä.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=foo-Ã¤.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo-Ã¤.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
@@ -715,7 +715,7 @@ describe('network', function() {
           });
 
         it('should reject "filename=foo.html, filename=bar.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'filename=foo.html, filename=bar.html'))
             .toThrowError(InvalidHeaderException, /invalid type format/);
         });
@@ -727,56 +727,56 @@ describe('network', function() {
 
         it('should reject ": inline; attachment; filename=foo.html',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 ': inline; attachment; filename=foo.html'))
             .toThrowError(InvalidHeaderException, /invalid type format/);
         });
 
         it('should reject "inline; attachment; filename=foo.html', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'inline; attachment; filename=foo.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; inline; filename=foo.html', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'attachment; inline; filename=foo.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename="foo.html".txt', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'attachment; filename="foo.html".txt'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename="bar', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename="bar'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=foo"bar;baz"qux', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'attachment; filename=foo"bar;baz"qux'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=foo.html, ' +
             'attachment; filename=bar.html', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename=foo.html, attachment; filename=bar.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; foo=foo filename=bar', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'attachment; foo=foo filename=bar'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
 
         it('should reject "attachment; filename=bar foo=foo', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'attachment; filename=bar foo=foo'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
@@ -787,7 +787,7 @@ describe('network', function() {
         });
 
         it('should reject "filename=foo.html; attachment', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'filename=foo.html; attachment'))
             .toThrowError(InvalidHeaderException, /invalid type format/);
         });
@@ -835,7 +835,7 @@ describe('network', function() {
               'modification-date="Wed, 12 Feb 1997 16:29:51 -0500"'))
             .toEqual({
               type: 'attachment',
-              parameters: { 
+              parameters: {
                 'modification-date': 'Wed, 12 Feb 1997 16:29:51 -0500'
               }
             });
@@ -882,9 +882,9 @@ describe('network', function() {
             });
         });
 
-        it('should reject "attachment; ' + 
+        it('should reject "attachment; ' +
             'filename*=\'\'foo-%c3%a4-%e2%82%ac.html"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
               'attachment; filename*=\'\'foo-%c3%a4-%e2%82%ac.html'))
             .toThrowError(InvalidHeaderException, /invalid extended.*value/);
         });
@@ -918,7 +918,7 @@ describe('network', function() {
 
         it('should reject "attachment; filename *=UTF-8\'\'foo-%c3%a4.html"',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename *=UTF-8\'\'foo-%c3%a4.html'))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });
@@ -945,7 +945,7 @@ describe('network', function() {
 
         it('should reject "attachment; filename*="UTF-8\'\'foo-%c3%a4.html""',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename*="UTF-8\'\'foo-%c3%a4.html"'))
             .toThrowError(InvalidHeaderException,
                 /invalid extended field value/);
@@ -953,7 +953,7 @@ describe('network', function() {
 
         it('should reject "attachment; filename*="foo%20bar.html""',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename*="foo%20bar.html"'))
             .toThrowError(InvalidHeaderException,
                 /invalid extended field value/);
@@ -961,14 +961,14 @@ describe('network', function() {
 
         it('should reject "attachment; filename*=UTF-8\'foo-%c3%a4.html"',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename*=UTF-8\'foo-%c3%a4.html'))
             .toThrowError(InvalidHeaderException,
                 /invalid extended field value/);
         });
 
         it('should reject "attachment; filename*=UTF-8\'\'foo%"', function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename*=UTF-8\'\'foo%'))
             .toThrowError(InvalidHeaderException,
                 /invalid extended field value/);
@@ -976,7 +976,7 @@ describe('network', function() {
 
         it('should reject "attachment; filename*=UTF-8\'\'f%oo.html"',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename*=UTF-8\'\'f%oo.html'))
             .toThrowError(InvalidHeaderException,
                 /invalid extended field value/);
@@ -1131,7 +1131,7 @@ describe('network', function() {
       describe('RFC2047 Encoding', function () {
         it('should reject "attachment; filename==?ISO-8859-1?Q?foo-=E4.html?="',
             function () {
-          expect(parseContentDisposition.bind(null, 
+          expect(parseContentDisposition.bind(null,
                 'attachment; filename==?ISO-8859-1?Q?foo-=E4.html?='))
             .toThrowError(InvalidHeaderException, /invalid parameter format/);
         });

@@ -598,7 +598,7 @@ var WorkerMessageHandler = {
           length: fullRequest.contentLength,
           disableAutoFetch: disableAutoFetch,
           rangeChunkSize: source.rangeChunkSize,
-          filename: filename         
+          filename: filename
         }, evaluatorOptions);
         pdfManagerCapability.resolve(pdfManager);
         cancelXHRs = null;

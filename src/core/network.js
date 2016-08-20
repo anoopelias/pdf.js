@@ -347,7 +347,7 @@ var NetworkManager = (function NetworkManagerClosure() {
    * LF            = <US-ASCII LF, linefeed (10)>
    * SP            = <US-ASCII SP, space (32)>
    * HT            = <US-ASCII HT, horizontal-tab (9)>
-   * CTL           = <any US-ASCII control character (octets 0 - 31) and 
+   * CTL           = <any US-ASCII control character (octets 0 - 31) and
    *                 DEL (127)>
    * OCTET         = <any 8-bit sequence of data>
    */
@@ -546,7 +546,7 @@ var NetworkManager = (function NetworkManagerClosure() {
         value = getUtf8(binary);
         break;
       default:
-        throw new 
+        throw new
           InvalidHeaderException('unsupported charset in extended field');
     }
 
@@ -614,7 +614,7 @@ var NetworkManager = (function NetworkManagerClosure() {
         var value;
 
         // calculate index to start at
-        index = PARAM_REGEXP.lastIndex = match[0].substr(-1) === ';' ? 
+        index = PARAM_REGEXP.lastIndex = match[0].substr(-1) === ';' ?
           index - 1 : index;
 
         // match parameters
