@@ -13,8 +13,6 @@ TODO :
   - Document Properties (Done)
   - Download (Done)
   - setTitle
-  - Annotations (?)
-  - Attachments (?)
 
 1. Remove comments for private functions in network.js
   
