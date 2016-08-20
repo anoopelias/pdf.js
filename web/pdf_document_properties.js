@@ -136,7 +136,7 @@ var PDFDocumentProperties = (function PDFDocumentPropertiesClosure() {
       // Get the document properties.
       this.pdfDocument.getMetadata().then(function(data) {
         var content = {
-          'fileName': getPDFFileNameFromURL(this.url),
+          'fileName': this._getFileName(),
           'fileSize': this._parseFileSize(),
           'title': data.info.Title,
           'author': data.info.Author,
@@ -164,6 +164,19 @@ var PDFDocumentProperties = (function PDFDocumentPropertiesClosure() {
       if (field && content !== undefined && content !== '') {
         field.textContent = content;
       }
+    },
+
+    /**
+     * @private
+     */
+    _getFileName: function PDFDocumentProperties_getFileName() {
+      var filename = this.pdfDocument.filename;
+
+      if (!filename) {
+        filename = getPDFFileNameFromURL(this.url);
+      }
+
+      return filename;
     },
 
     /**
