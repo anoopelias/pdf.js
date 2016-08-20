@@ -1,14 +1,12 @@
 
-The following changes are made from the original content-disposition npm module,
+1. Copied code (both implementation and tests) from content-disposition npm module.
+2. Behaviour of content-disposition has been modified here in pdf.js only for the below case,
+   - If there is an invalid encoding in utf8, the npm module will put a replacement character (\ufffd) and parses the rest. However, here in pdf.js, we will throw an error. The reason being, in npm module it uses Buffer class while here we use 
+    decodeURIComponent(escape(str));
 
-1. Changed all 'assert's to 'expect's
-2. Changed the line indentation and splits matching the linting requirements in pdf.js
 3. Changed charset of unit_test.html to 'utf-8'. This is to enable testing multi-byte unicode chars in content disposition.
-4. Buffer class in Node.js is not available in browser. So decode 'utf-8' character, we use 
-  decodeURIComponent(escape(str));
-However this cannot handle invalid unicode encoding pairs. So those test cases are commented now.
+4. Only unit tests are updated. Haven't looked at other tests (or Bots etc.).
 
 TODO :
 
-1. Test InvalidHeaderException
 3. Connect filename in the UI
