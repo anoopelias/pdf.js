@@ -103,7 +103,11 @@ function bundle(filename, outfilename, pathPrefix, initFiles, amdName, defines,
   var umd = require('./external/umdutils/verifier.js');
   initFiles = initFiles.map(function (p) { return pathPrefix + p; });
   var files = umd.readDependencies(initFiles).loadOrder.map(function (name) {
-    return pathPrefix + name.replace(/^[\w\-]+\//, '') + '.js';
+    if (name.indexOf('pdfjs') === 0) {
+      return pathPrefix + name.replace(/^[\w\-]+\//, '') + '.js';
+    } else {
+      return name + '.js';
+    }
   });
 
   var crlfchecker = require('./external/crlfchecker/crlfchecker.js');

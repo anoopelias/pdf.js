@@ -296,14 +296,15 @@ var NetworkManager = (function NetworkManagerClosure() {
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     define('pdfjs/core/network', ['exports', 'pdfjs/shared/util',
-      'pdfjs/core/worker'], factory);
+      'pdfjs/core/worker', 'external/content-disposition/index'], factory);
   } else if (typeof exports !== 'undefined') {
-    factory(exports, require('../shared/util.js'), require('./worker.js'));
+    factory(exports, require('../shared/util.js'), require('./worker.js'),
+        require('../../external/content-disposition/index.js'));
   } else {
     factory((root.pdfjsCoreNetwork = {}), root.pdfjsSharedUtil,
-      root.pdfjsCoreWorker);
+      root.pdfjsCoreWorker, root.extContentDisposition);
   }
-}(this, function (exports, sharedUtil, coreWorker) {
+}(this, function (exports, sharedUtil, coreWorker, contentDisposition) {
 
   var assert = sharedUtil.assert;
   var createPromiseCapability = sharedUtil.createPromiseCapability;
@@ -594,75 +595,7 @@ var NetworkManager = (function NetworkManagerClosure() {
 
     _parseContentDisposition: function
       PDFNetworkStreamFullRequestReader_parseContentDisposition(string) {
-        if (!string || typeof string !== 'string') {
-          throw new InvalidHeaderException('argument string is required');
-        }
-
-        var contentDisposition = {};
-        var match = DISPOSITION_TYPE_REGEXP.exec(string);
-        if (!match) {
-          throw new InvalidHeaderException('invalid type format');
-        }
-
-        // normalize type
-        var index = match[0].length;
-        contentDisposition.type = match[1].toLowerCase();
-
-        var key;
-        var names = [];
-        var params = {};
-        var value;
-
-        // calculate index to start at
-        index = PARAM_REGEXP.lastIndex = match[0].substr(-1) === ';' ?
-          index - 1 : index;
-
-        // match parameters
-        while ((match = PARAM_REGEXP.exec(string))) {
-          if (match.index !== index) {
-            throw new InvalidHeaderException('invalid parameter format');
-          }
-
-          index += match[0].length;
-          key = match[1].toLowerCase();
-          value = match[2];
-
-          if (names.indexOf(key) !== -1) {
-            throw new InvalidHeaderException('invalid duplicate parameter');
-          }
-
-          names.push(key);
-
-          if (key.indexOf('*') + 1 === key.length) {
-            // decode extended value
-            key = key.slice(0, -1);
-            value = decodefield(value);
-
-            // overwrite existing value
-            params[key] = value;
-            continue;
-          }
-
-          if (typeof params[key] === 'string') {
-            continue;
-          }
-
-          if (value[0] === '"') {
-            // remove quotes and escapes
-            value = value
-              .substr(1, value.length - 2)
-              .replace(QESC_REGEXP, '$1');
-          }
-
-          params[key] = value;
-        }
-
-        if (index !== -1 && index !== string.length) {
-          throw new InvalidHeaderException('invalid parameter format');
-        }
-
-        contentDisposition.parameters = params;
-        return contentDisposition;
+        return contentDisposition.parse(string);
     },
 
     _parseHeaders: function PDFNetworkStreamFullRequestReader_parseHeaders() {

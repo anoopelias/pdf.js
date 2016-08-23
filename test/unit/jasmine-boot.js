@@ -43,7 +43,8 @@
 var pdfjsLibs;
 
 function initializePDFJS(callback) {
-  require.config({paths: {'pdfjs': '../../src', 'pdfjs-web': '../../web'}});
+  require.config({paths: {'pdfjs': '../../src', 'pdfjs-web': '../../web',
+    'external': '../../external'}});
   require(['pdfjs/shared/util', 'pdfjs/display/global', 'pdfjs/core/primitives',
       'pdfjs/core/annotation', 'pdfjs/core/crypto', 'pdfjs/core/stream',
       'pdfjs/core/fonts', 'pdfjs/core/ps_parser', 'pdfjs/core/function',
@@ -51,12 +52,13 @@ function initializePDFJS(callback) {
       'pdfjs/core/worker', 'pdfjs/core/network', 'pdfjs/core/type1_parser',
       'pdfjs/core/cff_parser', 'pdfjs/display/api', 'pdfjs/display/metadata',
       'pdfjs/display/dom_utils', 'pdfjs-web/ui_utils', 'pdfjs/core/unicode',
-      'pdfjs/core/glyphlist'],
+      'pdfjs/core/glyphlist', 'external/content-disposition/index'],
     function (sharedUtil, displayGlobal, corePrimitives, coreAnnotation,
               coreCrypto, coreStream, coreFonts, corePsParser, coreFunction,
               coreParser, coreEvaluator, coreCMap, coreWorker, coreNetwork,
               coreType1Parser, coreCFFParser, displayAPI, displayMetadata,
-              displayDOMUtils, webUIUtils, coreUnicode, coreGlyphList) {
+              displayDOMUtils, webUIUtils, coreUnicode, coreGlyphList,
+              contentDisposition) {
 
       pdfjsLibs = {
         sharedUtil: sharedUtil,

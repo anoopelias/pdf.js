@@ -28,7 +28,12 @@ self.importScripts = (function (importScripts) {
 
 importScripts('../node_modules/requirejs/require.js');
 
-require.config({paths: {'pdfjs': '.'}});
+require.config({
+  paths: {
+    'pdfjs': '.',
+    'external': './../external'
+  }
+});
 require(['pdfjs/core/network', 'pdfjs/core/worker'],
     function (network, worker) {
   // Worker is loaded at this point.
