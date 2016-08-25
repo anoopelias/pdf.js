@@ -423,19 +423,6 @@ var UnexpectedResponseException =
   return UnexpectedResponseException;
 })();
 
-var InvalidHeaderException = (function InvalidHeaderExceptionClosure() {
-  function InvalidHeaderException(msg) {
-    this.name = 'InvalidHeaderException';
-    this.message = msg;
-  }
-
-  InvalidHeaderException.prototype = new Error();
-  InvalidHeaderException.constructor = InvalidHeaderException;
-
-  return InvalidHeaderException;
-})();
-
-
 var NotImplementedException = (function NotImplementedExceptionClosure() {
   function NotImplementedException(msg) {
     this.message = msg;
@@ -2337,7 +2324,6 @@ exports.StatTimer = StatTimer;
 exports.StreamType = StreamType;
 exports.TextRenderingMode = TextRenderingMode;
 exports.UnexpectedResponseException = UnexpectedResponseException;
-exports.InvalidHeaderException = InvalidHeaderException;
 exports.UnknownErrorException = UnknownErrorException;
 exports.Util = Util;
 exports.XRefParseException = XRefParseException;

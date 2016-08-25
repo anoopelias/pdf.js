@@ -162,4 +162,134 @@ describe('network', function() {
       done.fail(reason);
     });
   });
+
+  describe('contentDisposition', function() {
+    var getFilename;
+    beforeAll(function() {
+      var stream = new PDFNetworkStream({
+        source: {
+          url: pdf1,
+          rangeChunkSize: 65536,
+          disableStream: true,
+        },
+        disableRange: true
+      });
+
+      var fullReader = stream.getFullReader();
+      getFilename = fullReader._getFilename;
+    });
+
+    it('should not get filename from nothing', function() {
+      expect(getFilename()).not.toBeDefined();
+      expect(getFilename(null)).not.toBeDefined();
+    });
+
+    it('should not get filename if it is not present', function() {
+      expect(getFilename('inline')).not.toBeDefined();
+      expect(getFilename('attachment')).not.toBeDefined();
+
+      expect(getFilename('inline;')).not.toBeDefined();
+      expect(getFilename('attachment; ')).not.toBeDefined();
+
+      expect(getFilename('inline; bar=baz')).not.toBeDefined();
+    });
+
+    it('should get filename if available', function() {
+      expect(getFilename('inline;filename=foo.pdf')).toEqual('foo.pdf');
+      expect(getFilename(' inline ; filename = foo.pdf ')).toEqual('foo.pdf');
+      expect(getFilename('  inline  ;  filename  =  foo.pdf  '))
+        .toEqual('foo.pdf');
+    });
+
+    it('should not get filename if value is not present', function() {
+      expect(getFilename('inline; filename=')).not.toBeDefined();
+    });
+
+    it('should not allow filename when type is not present', function() {
+      expect(getFilename('filename=foo.pdf')).not.toBeDefined();
+      expect(getFilename(';filename=foo.pdf')).not.toBeDefined();
+      expect(getFilename(' ;filename=foo.pdf')).not.toBeDefined();
+    });
+
+    it('should not allow separators in filename', function() {
+      expect(getFilename('inline;filename=foo<>.pdf')).not.toBeDefined();
+      expect(getFilename('inline;filename=foo@bar.pdf')).not.toBeDefined();
+    });
+
+    it('should not allow control characters in filename', function() {
+      expect(getFilename('inline;filename=foo\r\n.pdf')).not.toBeDefined();
+      expect(getFilename('inline;filename=foo\b.pdf')).not.toBeDefined();
+    });
+
+    it('should get filename when other params are available', function() {
+      expect(getFilename('inline;filename=foo.pdf;bar=baz')).toEqual('foo.pdf');
+      expect(getFilename('inline;bar=baz;filename=foo.pdf')).toEqual('foo.pdf');
+    });
+
+    it('should not allow space in file name', function() {
+      expect(getFilename('inline;filename=foo bar.pdf')).not.toBeDefined();
+    });
+
+    it('should allow space in file name when quoted', function() {
+      expect(getFilename('inline;filename="foo bar.pdf"'))
+        .toEqual('foo bar.pdf');
+      expect(getFilename('inline;filename = " foo.pdf" '))
+        .toEqual(' foo.pdf');
+    });
+
+    it('should get filename when the value is quoted', function() {
+      expect(getFilename('inline;filename="foo.pdf"')).toEqual('foo.pdf');
+      expect(getFilename('inline;filename = "foo.pdf"')).toEqual('foo.pdf');
+    });
+
+    it('should not get filename when quotes is not closed', function() {
+      expect(getFilename('inline;filename="foo bar.pdf'))
+        .not.toBeDefined();
+      expect(getFilename('inline;filename="foo bar.pdf\\"'))
+        .not.toBeDefined();
+    });
+
+    it('should not allow quotes in file name', function() {
+      expect(getFilename('inline;filename="foo "bar" baz.pdf"'))
+        .not.toBeDefined();
+    });
+
+    it('should get filename when quotes are escaped', function() {
+      expect(getFilename('inline;filename="foo \\"bar\\" baz.pdf"'))
+        .toEqual('foo "bar" baz.pdf');
+    });
+
+    it('should get filename when a control character is escaped', function() {
+      expect(getFilename('inline;filename="foo\\\n.pdf"'))
+        .toEqual('foo\n.pdf');
+    });
+
+    it('should get filename when a normal character is escaped', function() {
+      expect(getFilename('inline;filename="foo.p\\df"'))
+        .toEqual('foo.pdf');
+    });
+
+    it('should allow separators when filename is quoted', function() {
+      expect(getFilename('inline;filename="foo<>.pdf"')).toEqual('foo<>.pdf');
+      expect(getFilename('inline;filename="foo@bar.pdf"'))
+        .toEqual('foo@bar.pdf');
+    });
+
+    it('should not allow control characters even when filename is quoted',
+        function() {
+      expect(getFilename('inline;filename="foo\r\n.pdf"')).not.toBeDefined();
+      expect(getFilename('inline;filename="foo\bbar.pdf"')).not.toBeDefined();
+    });
+
+    it('should not allow filename when other params are invalid', function() {
+      expect(getFilename('inline;filename=foo.pdf;bar=baz@.pdf'))
+          .not.toBeDefined();
+    });
+
+    it('should not allow a trailing semicolon', function() {
+      expect(getFilename('inline;filename=foo.pdf;')).not.toBeDefined();
+      expect(getFilename('inline;filename=foo.pdf; ')).not.toBeDefined();
+    });
+
+  });
 });

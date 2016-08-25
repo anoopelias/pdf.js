@@ -474,7 +474,6 @@ var WorkerMessageHandler = {
     // This context is actually holds references on pdfManager and handler,
     // until the latter is destroyed.
     var pdfManager;
-    var filename;
     var terminated = false;
     var cancelXHRs = null;
     var WorkerTasks = [];
@@ -516,7 +515,7 @@ var WorkerMessageHandler = {
             numPages: results[0],
             fingerprint: results[1],
             encrypted: !!results[2],
-            filename: pdfManager.filename
+            filename: pdfManager.filename,
           };
           loadDocumentCapability.resolve(doc);
         },
@@ -567,7 +566,7 @@ var WorkerMessageHandler = {
       }
 
       var fullRequest = pdfStream.getFullReader();
-      fullRequest.headersReady.then(function (headers) {
+      fullRequest.headersReady.then(function () {
         if (!fullRequest.isStreamingSupported ||
             !fullRequest.isRangeSupported) {
           // If stream or range are disabled, it's our only way to report
@@ -578,10 +577,6 @@ var WorkerMessageHandler = {
               total: evt.total
             });
           };
-        }
-
-        if (headers && headers.contentDisposition) {
-          filename = headers.contentDisposition.parameters.filename;
         }
 
         if (!fullRequest.isRangeSupported) {
@@ -598,7 +593,7 @@ var WorkerMessageHandler = {
           length: fullRequest.contentLength,
           disableAutoFetch: disableAutoFetch,
           rangeChunkSize: source.rangeChunkSize,
-          filename: filename
+          filename: fullRequest.filename,
         }, evaluatorOptions);
         pdfManagerCapability.resolve(pdfManager);
         cancelXHRs = null;
@@ -616,7 +611,7 @@ var WorkerMessageHandler = {
         // the data is array, instantiating directly from it
         try {
           pdfManager = new LocalPdfManager(docId, pdfFile, source.password,
-                                           evaluatorOptions, filename);
+                                       evaluatorOptions, fullRequest.filename);
           pdfManagerCapability.resolve(pdfManager);
         } catch (ex) {
           pdfManagerCapability.reject(ex);

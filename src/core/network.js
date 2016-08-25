@@ -311,7 +311,6 @@ var NetworkManager = (function NetworkManagerClosure() {
   var stringToUTF8String = sharedUtil.stringToUTF8String;
   var MissingPDFException = sharedUtil.MissingPDFException;
   var UnexpectedResponseException = sharedUtil.UnexpectedResponseException;
-  var InvalidHeaderException = sharedUtil.InvalidHeaderException;
 
   /** @implements {IPDFStream} */
   function PDFNetworkStream(options) {
@@ -395,6 +394,50 @@ var NetworkManager = (function NetworkManagerClosure() {
     this.onProgress = null;
   }
 
+  function composeRegEx(expr, containsExpr) {
+    return '(' + expr + '*(' + containsExpr + expr + '*)*)';
+  }
+
+  function contentDispositionRegEx() {
+    // See https://tools.ietf.org/html/rfc2616#page-15
+    var token = /(?:(?![()<>@,;:\\"\/\[\]?=\{\} \t])[\032-\176])+/.source;
+    var lws = /(?:\r\n[ \t])/.source;
+    // No CTLs, no quotes(") and no backslash (\)
+    var octets = /(?:[\032-!#-[\]-\176])/.source;
+    var quotedPair = /(?:\\([\x00-\x7f]))/.source;
+
+    var qdText = composeRegEx(octets, lws);
+    var quotedString = '(?:"' + composeRegEx(qdText, quotedPair) + '")';
+
+    // https://tools.ietf.org/html/rfc2616#section-3.6
+    var value = '(?:' + token + '|' + quotedString + ')';
+    var valueCapture = '(' + token + '|' + quotedString + ')';
+
+    // https://tools.ietf.org/html/rfc6266#page-4
+    var extToken = '(?:' + token + '\\*)';
+    // TODO: ext-token & ext-value
+    var dispExtParam = '(?:' + token + ' *= *' + value + ')';
+    var filenameParam = '(?:filename *= *' + valueCapture + ')';
+
+    var dispositionParam = '(?:' + filenameParam + '|' + dispExtParam + ')';
+    var dispositionType = '(?:inline|attachment|' + token + ')';
+
+    var contentDisposition = '^ *' + dispositionType +
+        ' *((?:; *' + dispositionParam + ' *)*)$';
+
+    var all = new RegExp(contentDisposition);
+    var param = new RegExp(dispositionParam, 'g');
+    var quotedStringExp = new RegExp(quotedString);
+    var quotedPairExp = new RegExp(quotedPair, 'g');
+
+    return {
+      all: all,
+      param: param,
+      quotedString: quotedStringExp,
+      quotedPair: quotedPairExp
+    };
+  }
+
   PDFNetworkStreamFullRequestReader.prototype = {
     _validateRangeRequestCapabilities: function
         PDFNetworkStreamFullRequestReader_validateRangeRequestCapabilities() {
@@ -434,31 +477,24 @@ var NetworkManager = (function NetworkManagerClosure() {
       return true;
     },
 
-    _parseContentDisposition: function
-      PDFNetworkStreamFullRequestReader_parseContentDisposition(string) {
-    },
+    _getFilename: function
+      PDFNetworkStreamFullRequestReader_getFilename(contentDisposition) {
+      var regexes = contentDispositionRegEx();
+      var results = regexes.all.exec(contentDisposition);
+      if (results && results[1]) {
+        var params = results[1];
 
-    _parseHeaders: function PDFNetworkStreamFullRequestReader_parseHeaders() {
-      try {
-        var headers = Object.create(null);
-        var networkManager = this._manager;
-        var fullRequestXhrId = this._fullRequestId;
-        var fullRequestXhr = networkManager.getRequestXhr(fullRequestXhrId);
-        var contentDispositionString =
-          fullRequestXhr.getResponseHeader('Content-Disposition');
-
-        if (contentDispositionString && contentDispositionString.length > 0) {
-          headers.contentDisposition =
-            this._parseContentDisposition(contentDispositionString);
-        }
-
-        return headers;
-      } catch(err) {
-        if (err instanceof InvalidHeaderException) {
-          // Ignore invalid headers
-          return headers;
-        } else {
-          throw err;
+        var paramMatch = null;
+        regexes.param.lastIndex = 0;
+        while (paramMatch = regexes.param.exec(params)) {
+          if (paramMatch[1]) {
+            var value = paramMatch[1];
+            var quotedStringMatch;
+            if (quotedStringMatch = regexes.quotedString.exec(value)) {
+              return quotedStringMatch[1].replace(regexes.quotedPair, '$1');
+            }
+            return value;
+          }
         }
       }
     },
@@ -472,7 +508,13 @@ var NetworkManager = (function NetworkManagerClosure() {
 
       var networkManager = this._manager;
       var fullRequestXhrId = this._fullRequestId;
-      var headers = this._parseHeaders();
+      var fullRequestXhr = networkManager.getRequestXhr(fullRequestXhrId);
+      var contentDispositionString =
+        fullRequestXhr.getResponseHeader('Content-Disposition');
+
+      if (contentDispositionString && contentDispositionString.length > 0) {
+          this.filename = this._getFilename(contentDispositionString);
+      }
 
       if (networkManager.isStreamingRequest(fullRequestXhrId)) {
         // We can continue fetching when progressive loading is enabled,
@@ -487,7 +529,7 @@ var NetworkManager = (function NetworkManagerClosure() {
         networkManager.abortRequest(fullRequestXhrId);
       }
 
-      this._headersReceivedCapability.resolve(headers);
+      this._headersReceivedCapability.resolve();
     },
 
     _onProgressiveData:

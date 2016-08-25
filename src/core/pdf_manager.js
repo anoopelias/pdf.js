@@ -50,7 +50,7 @@ var BasePdfManager = (function BasePdfManagerClosure() {
     },
 
     get filename() {
-      return this.pdfDocument.filename;
+      return this._filename;
     },
 
     onLoadedStream: function BasePdfManager_onLoadedStream() {
@@ -116,9 +116,10 @@ var BasePdfManager = (function BasePdfManagerClosure() {
 var LocalPdfManager = (function LocalPdfManagerClosure() {
   function LocalPdfManager(docId, data, password, evaluatorOptions, filename) {
     this._docId = docId;
+    this._filename = filename;
     this.evaluatorOptions = evaluatorOptions;
     var stream = new Stream(data);
-    this.pdfDocument = new PDFDocument(this, stream, password, filename);
+    this.pdfDocument = new PDFDocument(this, stream, password);
     this._loadedStreamCapability = createPromiseCapability();
     this._loadedStreamCapability.resolve(stream);
   }
@@ -164,6 +165,7 @@ var LocalPdfManager = (function LocalPdfManagerClosure() {
 var NetworkPdfManager = (function NetworkPdfManagerClosure() {
   function NetworkPdfManager(docId, pdfNetworkStream, args, evaluatorOptions) {
     this._docId = docId;
+    this._filename = args.filename;
     this.msgHandler = args.msgHandler;
     this.evaluatorOptions = evaluatorOptions;
 
@@ -176,7 +178,7 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
     };
     this.streamManager = new ChunkedStreamManager(pdfNetworkStream, params);
     this.pdfDocument = new PDFDocument(this, this.streamManager.getStream(),
-                                       args.password, args.filename);
+                                       args.password);
   }
 
   Util.inherit(NetworkPdfManager, BasePdfManager, {

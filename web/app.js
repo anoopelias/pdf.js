@@ -820,6 +820,7 @@ var PDFViewerApplication = {
 
     this.pdfDocumentProperties.setDocumentAndUrl(pdfDocument, this.url);
 
+    // Update the title if a file name from the network call is available
     this.setTitle(this.pdfDocumentProperties.getFileName());
 
     var downloadedPromise = pdfDocument.getDownloadInfo().then(function() {

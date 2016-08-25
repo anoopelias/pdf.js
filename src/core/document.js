@@ -349,23 +349,22 @@ var PDFDocument = (function PDFDocumentClosure() {
   var EMPTY_FINGERPRINT = '\x00\x00\x00\x00\x00\x00\x00' +
     '\x00\x00\x00\x00\x00\x00\x00\x00\x00';
 
-  function PDFDocument(pdfManager, arg, password, filename) {
+  function PDFDocument(pdfManager, arg, password) {
     if (isStream(arg)) {
-      init.call(this, pdfManager, arg, password, filename);
+      init.call(this, pdfManager, arg, password);
     } else if (isArrayBuffer(arg)) {
-      init.call(this, pdfManager, new Stream(arg), password, filename);
+      init.call(this, pdfManager, new Stream(arg), password);
     } else {
       error('PDFDocument: Unknown argument type');
     }
   }
 
-  function init(pdfManager, stream, password, filename) {
+  function init(pdfManager, stream, password) {
     assert(stream.length > 0, 'stream must have data');
     this.pdfManager = pdfManager;
     this.stream = stream;
     var xref = new XRef(this.stream, password, pdfManager);
     this.xref = xref;
-    this.filename = filename;
   }
 
   function find(stream, needle, limit, backwards) {
