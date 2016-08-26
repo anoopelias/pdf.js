@@ -1,5 +1,4 @@
-/* globals expect, it, describe, PDFNetworkStream, beforeAll,
-          InvalidHeaderException */
+/* globals expect, it, describe, PDFNetworkStream, beforeAll */
 
 'use strict';
 
@@ -201,6 +200,34 @@ describe('network', function() {
         .toEqual('foo.pdf');
     });
 
+    it('should get filename case insensitive', function() {
+      expect(getFilename('inline; FILENAME=foo.pdf')).toEqual('foo.pdf');
+      expect(getFilename('inline; Filename=foo.pdf')).toEqual('foo.pdf');
+      expect(getFilename('inline; FiLeNaMe=foo.pdf')).toEqual('foo.pdf');
+
+      expect(getFilename('INLINE;filename=foo.pdf')).toEqual('foo.pdf');
+      expect(getFilename('Attachment;filename=foo.pdf')).toEqual('foo.pdf');
+    });
+
+    it('should get filename when tab is present in the string', function() {
+      expect(getFilename('\tinline\t;\tfilename\t=\tfoo.pdf\t'))
+        .toEqual('foo.pdf');
+      expect(getFilename('\t\tinline\t\t;\t\tfilename\t\t=\t\tfoo.pdf\t\t'))
+        .toEqual('foo.pdf');
+      expect(getFilename('\t inline\t ;\t filename\t =\t foo.pdf\t '))
+        .toEqual('foo.pdf');
+    });
+
+    it('should get filename when newline is present in the string', function() {
+      expect(getFilename(
+            '\r\n inline\r\n ;\r\n filename\r\n =\r\n foo.pdf\r\n '))
+        .toEqual('foo.pdf');
+      expect(getFilename('inline\r\n\t;filename=foo.pdf'))
+        .toEqual('foo.pdf');
+      expect(getFilename('inline\r\n \r\n ;filename=foo.pdf'))
+        .toEqual('foo.pdf');
+    });
+
     it('should not get filename if value is not present', function() {
       expect(getFilename('inline; filename=')).not.toBeDefined();
     });
@@ -228,6 +255,7 @@ describe('network', function() {
 
     it('should not allow space in file name', function() {
       expect(getFilename('inline;filename=foo bar.pdf')).not.toBeDefined();
+      expect(getFilename('inline;filename=foo\tbar.pdf')).not.toBeDefined();
     });
 
     it('should allow space in file name when quoted', function() {
@@ -284,11 +312,26 @@ describe('network', function() {
     it('should not allow filename when other params are invalid', function() {
       expect(getFilename('inline;filename=foo.pdf;bar=baz@.pdf'))
           .not.toBeDefined();
+      expect(getFilename('inline;;filename=foo.pdf')).not.toBeDefined();
     });
 
     it('should not allow a trailing semicolon', function() {
       expect(getFilename('inline;filename=foo.pdf;')).not.toBeDefined();
       expect(getFilename('inline;filename=foo.pdf; ')).not.toBeDefined();
+    });
+
+    it('should ignore attributes present in the filename', function() {
+      expect(getFilename(
+            'inline;bar="bar;filename=baz.pdf;qux";filename=foo.pdf'))
+        .toEqual('foo.pdf');
+      expect(getFilename(
+            'inline;filename=foo.pdf;bar="bar;filename=baz.pdf"'))
+        .toEqual('foo.pdf');
+    });
+
+    it('should not allow filename to be specified twice', function() {
+      expect(getFilename('inline;filename=foo.pdf;filename=bar.pdf'))
+        .not.toBeDefined();
     });
 
   });

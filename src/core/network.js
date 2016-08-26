@@ -312,6 +312,46 @@ var NetworkManager = (function NetworkManagerClosure() {
   var MissingPDFException = sharedUtil.MissingPDFException;
   var UnexpectedResponseException = sharedUtil.UnexpectedResponseException;
 
+  var REGEX_QUOTED_PAIR = /(?:\\([\x00-\x7f]))/g;
+  var REGEX_CONTENT_DISPOSITION = contentDispositionRegEx();
+
+  function contentDispositionRegEx() {
+    // The Regular Expressions below are based on Section 2.2 of
+    // RFC2616. Please refer to the same for exact definitions.
+    //
+    // Note : Using '(?:' at the start of the group ensures that the group
+    // is matched but not captured. The regex's below are designed to 
+    // validate for proper header content, but capture only filename param.
+    //
+    var qdText = /(?:[\032-!#-[\]-\176])/.source;
+    var quotedPair = /(?:\\[\x00-\x7f])/.source;
+    var text = '(?:' + qdText + '*(?:' + quotedPair + qdText + '*)*)';
+
+    var quotedString = '(?:"' + text + '")';
+    var quotedStringGroup = '(?:"(' + text + ')")';
+
+    var token = /(?:(?:(?![()<>@,;:\\"\/\[\]?=\{\} \t])[\032-\176])+)/.source;
+
+    var value = '(?:' + token + '|' + quotedString + ')';
+    var valueGroup = '(?:(' + token + ')|' + quotedStringGroup + ')';
+
+    var lws = /(?:(?:(?:\r\n)?[ \t]+)*)/.source;   
+
+    // The Regular Expressions below are based on Section 4.1 of RFC6266.
+    var equals = '(?:' + lws + '=' + lws + ')';
+    // TODO: ext-token & ext-value
+    var extParam = '(?:;' + lws + '(?:(?!filename)' + token + ')' + equals +
+        value + lws + ')';
+    var filenameParam = '(?:;' + lws + 'filename' + equals + valueGroup +
+        lws + ')';
+
+    var dispositionType = '(?:' + lws + token + lws + ')';
+
+    return new RegExp('^' + dispositionType + extParam + '*' +
+        filenameParam + extParam + '*$', 'i');
+
+  }
+
   /** @implements {IPDFStream} */
   function PDFNetworkStream(options) {
     this._options = options;
@@ -394,50 +434,6 @@ var NetworkManager = (function NetworkManagerClosure() {
     this.onProgress = null;
   }
 
-  function composeRegEx(expr, containsExpr) {
-    return '(' + expr + '*(' + containsExpr + expr + '*)*)';
-  }
-
-  function contentDispositionRegEx() {
-    // See https://tools.ietf.org/html/rfc2616#page-15
-    var token = /(?:(?![()<>@,;:\\"\/\[\]?=\{\} \t])[\032-\176])+/.source;
-    var lws = /(?:\r\n[ \t])/.source;
-    // No CTLs, no quotes(") and no backslash (\)
-    var octets = /(?:[\032-!#-[\]-\176])/.source;
-    var quotedPair = /(?:\\([\x00-\x7f]))/.source;
-
-    var qdText = composeRegEx(octets, lws);
-    var quotedString = '(?:"' + composeRegEx(qdText, quotedPair) + '")';
-
-    // https://tools.ietf.org/html/rfc2616#section-3.6
-    var value = '(?:' + token + '|' + quotedString + ')';
-    var valueCapture = '(' + token + '|' + quotedString + ')';
-
-    // https://tools.ietf.org/html/rfc6266#page-4
-    var extToken = '(?:' + token + '\\*)';
-    // TODO: ext-token & ext-value
-    var dispExtParam = '(?:' + token + ' *= *' + value + ')';
-    var filenameParam = '(?:filename *= *' + valueCapture + ')';
-
-    var dispositionParam = '(?:' + filenameParam + '|' + dispExtParam + ')';
-    var dispositionType = '(?:inline|attachment|' + token + ')';
-
-    var contentDisposition = '^ *' + dispositionType +
-        ' *((?:; *' + dispositionParam + ' *)*)$';
-
-    var all = new RegExp(contentDisposition);
-    var param = new RegExp(dispositionParam, 'g');
-    var quotedStringExp = new RegExp(quotedString);
-    var quotedPairExp = new RegExp(quotedPair, 'g');
-
-    return {
-      all: all,
-      param: param,
-      quotedString: quotedStringExp,
-      quotedPair: quotedPairExp
-    };
-  }
-
   PDFNetworkStreamFullRequestReader.prototype = {
     _validateRangeRequestCapabilities: function
         PDFNetworkStreamFullRequestReader_validateRangeRequestCapabilities() {
@@ -478,24 +474,12 @@ var NetworkManager = (function NetworkManagerClosure() {
     },
 
     _getFilename: function
-      PDFNetworkStreamFullRequestReader_getFilename(contentDisposition) {
-      var regexes = contentDispositionRegEx();
-      var results = regexes.all.exec(contentDisposition);
-      if (results && results[1]) {
-        var params = results[1];
+        PDFNetworkStreamFullRequestReader_getFilename(contentDisposition) {
 
-        var paramMatch = null;
-        regexes.param.lastIndex = 0;
-        while (paramMatch = regexes.param.exec(params)) {
-          if (paramMatch[1]) {
-            var value = paramMatch[1];
-            var quotedStringMatch;
-            if (quotedStringMatch = regexes.quotedString.exec(value)) {
-              return quotedStringMatch[1].replace(regexes.quotedPair, '$1');
-            }
-            return value;
-          }
-        }
+      var match = REGEX_CONTENT_DISPOSITION.exec(contentDisposition);
+
+      if (match) {
+        return match[1] || match[2].replace(REGEX_QUOTED_PAIR, '$1');
       }
     },
 
